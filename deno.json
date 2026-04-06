@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --allow-read --allow-write --watch main.ts"
+  },
+  "imports": {
+    "@hono/hono": "jsr:@hono/hono@^4.12.10",
+    "@std/assert": "jsr:@std/assert@1"
+  },
+  "unstable": ["kv"]
+}

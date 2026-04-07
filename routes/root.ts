@@ -1,8 +1,12 @@
 import { Hono } from "@hono/hono";
 
-const projects = new Hono();
+const root = new Hono();
 
-projects.get("/", async (c) => {
-  const html = await Deno.readFile("./static/api-docs.html");
-  return c.html(new TextDecoder().decode(html));
+const html = await fetch(new URL("./static/api-docs.html", import.meta.url))
+  .then((r) => r.text());
+
+root.get("/", async (c) => {
+  return c.html(html);
 });
+
+export default root;

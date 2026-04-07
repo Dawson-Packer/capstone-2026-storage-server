@@ -1,9 +1,7 @@
 import { Hono } from "@hono/hono";
+import html from "../static/api-docs.html" with { type: "text" };
 
 const root = new Hono();
-
-const html = await fetch(new URL("./static/api-docs.html", import.meta.url))
-  .then((r) => r.text());
 
 root.get("/", async (c) => {
   return c.html(html);

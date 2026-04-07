@@ -1,10 +1,10 @@
 import { Hono } from "@hono/hono";
-import html from "../static/api-docs.html" with { type: "text" };
 
 const root = new Hono();
 
 root.get("/", async (c) => {
-  return c.html(html);
+  const html = await Deno.readFile("./static/api-docs.html");
+  return c.html(new TextDecoder().decode(html));
 });
 
 export default root;

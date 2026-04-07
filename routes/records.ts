@@ -4,16 +4,16 @@ import { Project, Record } from "../types.ts";
 
 const records = new Hono();
 
-records.get("/:projectId", async (c) => {
-  const projectId = c.req.param("projectId");
-  console.log(projectId);
+records.get("/:id", async (c) => {
+  const id = c.req.param("id");
+  console.log(id);
 
-  const project = await kv.get<Project>(["projects", projectId]);
+  const project = await kv.get<Project>(["projects", id]);
   if (!project.value) return c.json({ error: "project not found" }, 404);
 
   const result: Record[] = [];
   for await (
-    const entry of kv.list<Record>({ prefix: ["records", projectId] })
+    const entry of kv.list<Record>({ prefix: ["records", id] })
   ) {
     result.push(entry.value);
   }
@@ -21,11 +21,11 @@ records.get("/:projectId", async (c) => {
   return c.json(result);
 });
 
-records.post("/:projectId", async (c) => {
-  const projectId = c.req.param("projectId");
-  console.log(projectId);
+records.post("/:id", async (c) => {
+  const id = c.req.param("id");
+  console.log(id);
 
-  const project = await kv.get<Project>(["projects", projectId]);
+  const project = await kv.get<Project>(["projects", id]);
   console.log(project.value);
 
   if (!project.value) return c.json({ error: "project not found" }, 404);
@@ -49,7 +49,7 @@ records.post("/:projectId", async (c) => {
 
   const record: Record = {
     id: crypto.randomUUID(),
-    projectId,
+    projectId: id,
     temperature,
     latitude,
     longitude,
@@ -57,7 +57,7 @@ records.post("/:projectId", async (c) => {
     timestamp,
   };
 
-  await kv.set(["records", projectId, record.id], record);
+  await kv.set(["records", id, record.id], record);
   return c.json(record, 201);
 });
 

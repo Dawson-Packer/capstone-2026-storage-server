@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Documentation</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600@family=IBM+Plex+Sans:wght@300;400;500@display=swap"
+    />
+    <style>
+      :root {
+        --bg: #0a0e13;
+        --surface: #111720;
+        --border: #1e2d3d;
+        --text: #cdd9e5;
+        --muted: #546e7a;
+        --accent: #58a6ff;
+        --green: #3fb950;
+        --red: #f85149;
+        --yellow: #d29922;
+        --tag-get: #0d4a1f;
+        --tag-get-text: #3fb950;
+        --tag-post: #0d2e5c;
+        --tag-post-text: #58a6ff;
+        --tag-delete: #4a0d0d;
+        --tag-delete-text: #f85149;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "IBM Plex Sans", sans-serif;
+        font-weight: 300;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      /* grid lines background */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(88, 166, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(
+          90deg,
+          rgba(88, 166, 255, 0.03),
+          1px,
+          transparent 1px
+        );
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 60px 24px 120px;
+      }
+
+      header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 40px;
+        margin-bottom: 60px;
+        animation: fadeUp 0.5s ease both;
+      }
+
+      .eyebrow {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: clamp(28px, 5vw, 42px);
+        font-weight: 600;
+        color: #e6edf3;
+        line-height: 1.2;
+        margin-bottom: 16px;
+      }
+
+      header p {
+        color: var(--muted);
+        font-size: 15px;
+        max-width: 480px;
+      }
+
+      .base-url {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 16px;
+        margin-top: 24px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 13px;
+      }
+
+      .base-url span {
+        color: var(--muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .base-url code {
+        color: var(--accent);
+        padding: 2px 10px;
+      }
+
+      /* sections */
+      .section {
+        margin-bottom: 56px;
+        animation: fadeUp 0.5s ease both;
+      }
+
+      .section:nth-child(2) {
+        animation-delay: 0.05s;
+      }
+      .section:nth-child(3) {
+        animation-delay: 0.10s;
+      }
+      .section:nth-child(4) {
+        animation-delay: 0.15s;
+      }
+
+      .section-title {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .section-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* endpoint cards */
+      .endpoint {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        transition: border-color 0.2s;
+      }
+
+      .endpoint:hover {
+        border-color: #2d3f50;
+      }
+
+      .endpoint-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .method {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        padding: 3px 8px;
+        border-radius: 4px;
+        min-width: 52px;
+        text-align: center;
+      }
+
+      .GET {
+        background: var(--tag-get);
+        color: var(--tag-get-text);
+      }
+
+      .POST {
+        background: var(--tag-post);
+        color: var(--tag-post-text);
+      }
+
+      .DELETE {
+        background: var(--tag-delete);
+        color: var(--tag-delete-text);
+      }
+
+      .path {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 14px;
+        color: #e6edf3;
+        flex: 1;
+      }
+
+      .path em {
+        font-style: normal;
+        color: var(--yellow);
+      }
+
+      .summary {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .chevron {
+        color: var(--muted);
+        font-size: 12px;
+        transition: transform 0.2s;
+      }
+
+      .endpoint-body {
+        /* display: block; */
+        display: none;
+        border-top: 1px solid var(--border);
+        padding: 20px;
+      }
+
+      .endpoint.open .endpoint-body {
+        display: block;
+      }
+
+      .endpoint.open .chevron {
+        transform: rotate(90deg);
+      }
+
+      .endpoint-body p {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 16px;
+      }
+
+      /* fields table */
+      .fields {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        margin-bottom: 16px;
+      }
+
+      .fields th {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-align: left;
+        padding: 6px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .fields td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #161f28;
+        vertical-align: top;
+      }
+
+      .fields tr:last-child td {
+        border-bottom: none;
+      }
+
+      .fields td:first-child {
+        font-family: "IBM Plex Mono", monospace;
+        color: var(--accent);
+      }
+
+      .fields td:nth-child(2) {
+        font-family: "IBM Plex Mono", monospace;
+        color: var(--yellow);
+        font-size: 12px;
+      }
+
+      .fields td:last-child {
+        color: var(--muted);
+      }
+
+      /* code blocks */
+      .label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      pre {
+        background-color: #0d1117;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 16px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12.5px;
+        line-height: 1.7;
+        overflow-x: auto;
+        margin-bottom: 16px;
+      }
+
+      .kw {
+        color: var(--muted);
+      }
+
+      .str {
+        color: #a5d6ff;
+      }
+
+      .num {
+        color: #79c0ff;
+      }
+      .key {
+        color: var(--green);
+      }
+
+      .cmt {
+        color: #484f58;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="eyebrow">Remote Monitoring Data API</div>
+        <h1>API Reference</h1>
+        <p>
+          A REST API for managing remote monitoring projects and collected data.
+        </p>
+        <div class="base-url">
+          <span>Base URL</span>
+          <!-- <a href="https://capstone-2026-storage-server.dawson-packer.deno.net"> -->
+          <code>
+            https://capstone-2026-storage-server.dawson-packer.deno.net</code>
+          <!-- </a> -->
+        </div>
+      </header>
+      <!-- Projects -->
+      <div class="section">
+        <div class="section-title">Projects</div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggle(this)">
+            <span class="method GET">GET</span>
+            <span class="path">/projects</span>
+            <span class="summary">List all projects</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Returns an array of all projects.</p>
+            <div class="label">Response</div>
+            <pre>
+<span class="kw">[</span>
+  <span class="kw">{</span>
+    <span class="key">"id"</span><span class="kw">:</span>   <span class="str">"d3b4a1c2-..."</span><span class="kw">,</span>
+    <span class="key">"name"</span><span class="kw">:</span> <span class="str">"Togiak April 2026"</span>
+  <span class="kw">}</span>
+<span class="kw">]</span></pre>
+          </div>
+        </div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="path">/projects</span>
+        <span class="summary">Create a project</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Creates a new project. Project names must be unique.</p>
+        <div class="label">Request body</div>
+        <table class="fields">
+          <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+          <tr><td>name</td><td>string</td><td>Unique name for the project</td></tr>
+        </table>
+        <div class="label">Example</div>
+        <pre><span class="kw">{</span>
+  <span class="key">"name"</span><span class="kw">:</span> <span class="str">"Togiak April 2026"</span>
+<span class="kw">}</span></pre>
+        <div class="label">Response <span style="color:#3fb950;font-size:11px;margin-left:8px;">201 Created</span></div>
+        <pre><span class="kw">{</span>
+  <span class="key">"id"</span><span class="kw">:</span>   <span class="str">"d3b4a1c2-..."</span><span class="kw">,</span>
+  <span class="key">"name"</span><span class="kw">:</span> <span class="str">"Togiak April 2026"</span>
+<span class="kw">}</span></pre>
+      </div>
+    </div>
+ 
+    <!-- <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method DELETE">DELETE</span>
+        <span class="path">/projects/<em>:id</em></span>
+        <span class="summary">Delete a project</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Deletes a project and all of its associated records.</p>
+        <div class="label">URL parameters</div>
+        <table class="fields">
+          <tr><th>Param</th><th>Type</th><th>Description</th></tr>
+          <tr><td>id</td><td>string</td><td>The project ID</td></tr>
+        </table>
+        <div class="label">Response <span style="color:#3fb950;font-size:11px;margin-left:8px;">200 OK</span></div>
+        <pre><span class="kw">{</span>
+  <span class="key">"deleted"</span><span class="kw">:</span> <span class="str">"d3b4a1c2-..."</span>
+<span class="kw">}</span></pre>
+      </div>
+    </div> -->
+  </div>
+ 
+  <!-- Records -->
+  <div class="section">
+    <div class="section-title">Records</div>
+ 
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method GET">GET</span>
+        <span class="path">/records/<em>:id</em></span>
+        <span class="summary">Get all records for a project</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Returns all records belonging to the specified project.</p>
+        <div class="label">URL parameters</div>
+        <table class="fields">
+          <tr><th>Param</th><th>Type</th><th>Description</th></tr>
+          <tr><td>id</td><td>string</td><td>The project ID</td></tr>
+        </table>
+        <div class="label">Response</div>
+        <pre><span class="kw">[</span>
+  <span class="kw">{</span>
+    <span class="key">"id"</span><span class="kw">:</span>          <span class="str">"9f2c3e1a-..."</span><span class="kw">,</span>
+    <span class="key">"projectId"</span><span class="kw">:</span>   <span class="str">"d3b4a1c2-..."</span><span class="kw">,</span>
+    <span class="key">"temperature"</span><span class="kw">:</span> <span class="num">-4.2</span><span class="kw">,</span>
+    <span class="key">"latitude"</span><span class="kw">:</span>    <span class="num">71.2906</span><span class="kw">,</span>
+    <span class="key">"longitude"</span><span class="kw">:</span>   <span class="num">-156.7886</span><span class="kw">,</span>
+    <span class="key">"voltage"</span><span class="kw">:</span>     <span class="num">3.71</span><span class="kw">,</span>
+    <span class="key">"timestamp"</span><span class="kw">:</span>   <span class="str">"2026-04-05T12:00:00Z"</span>
+  <span class="kw">}</span>
+<span class="kw">]</span></pre>
+      </div>
+    </div>
+ 
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="path">/records/<em>:id</em></span>
+        <span class="summary">Add a record to a project</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Adds a new sensor record to the specified project.</p>
+        <div class="label">URL parameters</div>
+        <table class="fields">
+          <tr><th>Param</th><th>Type</th><th>Description</th></tr>
+          <tr><td>id</td><td>string</td><td>The project ID</td></tr>
+        </table>
+        <div class="label">Request body</div>
+        <table class="fields">
+          <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+          <tr><td>temperature</td><td>float</td><td>Temperature reading</td></tr>
+          <tr><td>latitude</td><td>float</td><td>Latitude coordinate</td></tr>
+          <tr><td>longitude</td><td>float</td><td>Longitude coordinate</td></tr>
+          <tr><td>voltage</td><td>float</td><td>Voltage reading</td></tr>
+          <tr><td>timestamp</td><td>string</td><td>ISO 8601 datetime</td></tr>
+        </table>
+        <div class="label">Example</div>
+        <pre><span class="kw">{</span>
+  <span class="key">"temperature"</span><span class="kw">:</span> <span class="num">-4.2</span><span class="kw">,</span>
+  <span class="key">"latitude"</span><span class="kw">:</span>    <span class="num">71.2906</span><span class="kw">,</span>
+  <span class="key">"longitude"</span><span class="kw">:</span>   <span class="num">-156.7886</span><span class="kw">,</span>
+  <span class="key">"voltage"</span><span class="kw">:</span>     <span class="num">3.71</span><span class="kw">,</span>
+  <span class="key">"timestamp"</span><span class="kw">:</span>   <span class="str">"2026-04-05T12:00:00Z"</span>
+<span class="kw">}</span></pre>
+        <div class="label">Response <span style="color:#3fb950;font-size:11px;margin-left:8px;">201 Created</span></div>
+        <pre><span class="kw">{</span>
+  <span class="key">"id"</span><span class="kw">:</span>          <span class="str">"9f2c3e1a-..."</span><span class="kw">,</span>
+  <span class="key">"projectId"</span><span class="kw">:</span>   <span class="str">"d3b4a1c2-..."</span><span class="kw">,</span>
+  <span class="key">"temperature"</span><span class="kw">:</span> <span class="num">-4.2</span><span class="kw">,</span>
+  <span class="key">"latitude"</span><span class="kw">:</span>    <span class="num">71.2906</span><span class="kw">,</span>
+  <span class="key">"longitude"</span><span class="kw">:</span>   <span class="num">-156.7886</span><span class="kw">,</span>
+  <span class="key">"voltage"</span><span class="kw">:</span>     <span class="num">3.71</span><span class="kw">,</span>
+  <span class="key">"timestamp"</span><span class="kw">:</span>   <span class="str">"2026-04-05T12:00:00Z"</span>
+<span class="kw">}</span></pre>
+      </div>
+    </div>
+ 
+</div>
+    <script>
+      function toggle(header) {
+        header.closest(".endpoint").classList.toggle("open");
+      }
+    </script>
+  </body>
+</html>
